@@ -84,7 +84,6 @@ function loginUser(req, res) {
 
     User.findOne({ email: email }, (err, user) => {
         if (err) return res.status(500).send({ message: 'Error en la peticion' });
-
         if (user) {
             bcrypt.compare(password, user.password, (err, check) => {
                 if (check) {
@@ -278,22 +277,41 @@ function updateUser(req, res) {
     var userId = req.params.id;
     var update = req.body;
 
-    console.log(update);
     //borrar la propiedad pass.
-
     delete update.password;
+
     if (userId != req.user.sub) {
         return res.status(500).send({ message: 'No tienes permisos' });
     }
 
-    User.findByIdAndUpdate(userId, update, { new: true }, (err, userUpdated) => {
-        if (err) return res.status(500).send({ message: 'Error en la peticion' });
+    User.find({
+        $or: [
+            { email: update.email.toLowerCase() },
+            { nick: update.nick.toLowerCase() }
+        ]
+    }).exec((err, users) => {
+        var user_isset = false;
+        users.forEach((user) => {
+            if (user._id != userId) {
+                user_isset = true;
+            }
+        });
+        if (user_isset) {
+            res.status(404).send({ message: "los datos ya estan en uso." });
+        } else {
 
-        if (!userUpdated) return res.status(404).send({ message: 'No se ha podido actualizar el usuario.' });
+            User.findByIdAndUpdate(userId, update, { new: true }, (err, userUpdated) => {
+                if (err) return res.status(500).send({ message: 'Error en la peticion' });
 
-        return res.status(200).send({ user: userUpdated });
+                if (!userUpdated) return res.status(404).send({ message: 'No se ha podido actualizar el usuario.' });
 
-    });
+                return res.status(200).send({ user: userUpdated });
+
+            });
+        }
+    })
+
+
 
 }
 
