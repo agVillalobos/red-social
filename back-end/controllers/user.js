@@ -118,10 +118,31 @@ function getUser(req, res) {
 
         //     return res.status(200).send({user, follow});
         // });
+        var identity_user_id = req.user.sub;
+        var user_id = userId;
 
-        followThisUser(req.user.sub, userId).then((value) => {
-            return res.status(200).send({ user, value });
-        });
+        Follow.findOne({ "user": identity_user_id, "followed": user_id })
+            .exec((err, following) => {
+                if (err) return handleError(err);
+                Follow.findOne({ "user": user_id, "followed": identity_user_id })
+                    .exec((err, followed) => {
+                        if (err) return handleError(err);
+
+                        return res.status(200).send({
+                            user,
+                            following: following,
+                            followed: followed
+                        });
+                    });
+
+            });
+
+
+
+        //Buscar porque no sirve el async y el await
+        // followThisUser(req.user.sub, userId).then((value) => {
+        //     return res.status(200).send({ user, value });
+        // });
     });
 }
 
@@ -162,15 +183,46 @@ function getUsers(req, res) {
 
         if (!users) return res.status(404).send({ message: 'No hay usuarios disponibles.' });
 
-        followUserIds(identity_user_id).then((value) => {
-            return res.status(200).send({
-                users,
-                users_following: value.following,
-                users_follow_me: value.followed,
-                total,
-                pages: Math.ceil(total / itemsPerPage),
-            });
+        //usar followUserIds en vez.
+        Follow.find({ "user": identity_user_id }).select({ '_id': 0, '_v': 0, 'user': 0 }).exec((err, following) => {
+
+            Follow.find({ "followed": identity_user_id }).select({ '_id': 0, '_v': 0, 'followed': 0 })
+                .exec((err, followed) => {
+
+                    var following_clean = [];
+                    if (following) {
+                        following.forEach((follow) => {
+                            following_clean.push(follow.followed);
+                        });
+                    }
+
+                    var followed_clean = [];
+                    if (followed) {
+                        followed.forEach(follow => {
+                            followed_clean.push(follow.user);
+                        });
+                    }
+                    return res.status(200).send({
+                        users,
+                        users_following: following_clean,
+                        users_follow_me: followed_clean,
+                        total,
+                        pages: Math.ceil(total / itemsPerPage),
+                    });
+                });
+
         });
+
+
+        // followUserIds(identity_user_id).then((value) => {
+        //     return res.status(200).send({
+        //         users,
+        //         users_following: value.following,
+        //         users_follow_me: value.followed,
+        //         total,
+        //         pages: Math.ceil(total / itemsPerPage),
+        //     });
+        // });
     });
 }
 

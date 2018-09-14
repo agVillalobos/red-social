@@ -33,7 +33,7 @@ export class LoginComponent implements OnInit {
         this._userService.signup(this.user).subscribe(
             response => {
                 this.identity = response.user;
-                console.log("user"+this.identity);
+                // console.log("user" + this.identity);
                 if (!this.identity || !this.identity._id) {
                     this.status = 'error';
                 } else {
@@ -76,7 +76,7 @@ export class LoginComponent implements OnInit {
         this._userService.getCounters().subscribe(
             response => {
                 localStorage.setItem('stats', JSON.stringify(response));
-                this.status='success';
+                this.status = 'success';
                 this._router.navigate(['/']);
             },
             error => {
