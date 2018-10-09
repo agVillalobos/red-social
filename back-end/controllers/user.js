@@ -363,8 +363,6 @@ function updateUser(req, res) {
         }
     })
 
-
-
 }
 
 //Subir archivos de imagen/avatar de usuario

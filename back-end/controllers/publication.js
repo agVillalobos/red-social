@@ -37,7 +37,7 @@ function getPublications(req, res) {
     var page = 1;
     if (req.params.page)
         page = req.params.page;
-    var itemsPerPage = 2;
+    var itemsPerPage = 4;
 
     Follow.find({ user: req.user.sub }).populate('followed').exec((err, follows) => {
         if (err) return res.status(500).send({ message: 'error al devolver el seguiomiento.' });

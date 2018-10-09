@@ -22,6 +22,7 @@ export class TimelineComponent implements OnInit {
     public pages;
     public itemsPerPages;
     public publications: Publication[];
+    public showImage;
 
     constructor(
         private _route: ActivatedRoute,
@@ -86,7 +87,22 @@ export class TimelineComponent implements OnInit {
         this.getPublications(this.page, true);
     }
 
-    refresh(event){
+    refresh(event = null){
         this.getPublications(1);
+    }
+
+    showThisImage(id){
+        this.showImage = id;
+    }
+
+    deletePublication(id){
+        this._publicationService.deletePublication(this.token, id).subscribe(
+            response=>{
+                this.refresh();
+            },
+            error=>{
+                console.log(error);
+            }
+        );
     }
 }
