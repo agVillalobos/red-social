@@ -41,7 +41,7 @@
 
         <div class="stats pull-left" *ngIf="stats">
             <div class="following-data">
-                <a href="#">
+                <a [routerLink]="['/siguiendo', user._id,1]">
                     <span class="label-stat">
                         Siguiendo
                     </span>
@@ -52,7 +52,7 @@
             </div>
 
             <div class="following-data">
-                <a href="#">
+                <a [routerLink]="['/seguidores', user._id, 1]">
                     <span class="label-stat">
                         Seguidores
                     </span>
