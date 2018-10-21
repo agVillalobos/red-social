@@ -72,7 +72,6 @@ function saveUser(req, res) {
             message: 'Envia todos los campos necesarios'
         });
     }
-
 }
 
 
@@ -368,8 +367,6 @@ function updateUser(req, res) {
 //Subir archivos de imagen/avatar de usuario
 function uploadImage(req, res) {
     var userId = req.params.id;
-
-
 
     if (req.files) {
         var file_path = req.files.image.path;
